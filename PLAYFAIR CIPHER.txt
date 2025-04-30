@@ -1,0 +1,63 @@
+PLAYFAI CIPHER
+
+
+def generate_matrix(key):
+    key = "".join(dict.fromkeys(key.upper().replace("J", "I")))
+    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+    matrix, used_chars = [], set()
+    
+    for char in key + alphabet:
+        if char not in used_chars:
+            matrix.append(char)
+            used_chars.add(char)
+    
+    return [matrix[i:i+5] for i in range(0, 25, 5)]
+
+def find_pos(matrix, letter):
+    for r, row in enumerate(matrix):
+        if letter in row:
+            return r, row.index(letter)
+    raise ValueError(f"Letter '{letter}' not found in matrix")  # Handle missing letters
+
+def prepare_text(text):
+    text = text.upper().replace("J", "I").replace(" ", "")
+    prepared, i = "", 0
+    while i < len(text):
+        a = text[i]
+        b = text[i+1] if i+1 < len(text) else "X"
+        if a == b:
+            prepared += a + "X"
+            i += 1
+        else:
+            prepared += a + b
+            i += 2
+    if len(prepared) % 2:
+        prepared += "X"
+    return prepared
+
+def playfair(text, key, enc=True):
+    matrix, text, result = generate_matrix(key), prepare_text(text), ""
+    
+    for a, b in zip(text[::2], text[1::2]):
+        r1, c1 = find_pos(matrix, a)
+        r2, c2 = find_pos(matrix, b)
+
+        if r1 == r2:  # Same row
+            c1, c2 = (c1 + (1 if enc else -1)) % 5, (c2 + (1 if enc else -1)) % 5
+        elif c1 == c2:  # Same column
+            r1, r2 = (r1 + (1 if enc else -1)) % 5, (r2 + (1 if enc else -1)) % 5
+        else:  # Rectangle swap
+            c1, c2 = c2, c1
+
+        result += matrix[r1][c1] + matrix[r2][c2]
+
+    return result if enc else result.rstrip("X")  # Only strip trailing 'X' if it's padding
+
+# --- Input and Execution ---
+key = input("Enter key: ")
+text = input("Enter text: ")
+ciphertext = playfair(text, key, True)
+decrypted_text = playfair(ciphertext, key, False)
+
+print("Ciphertext:", ciphertext)
+print("Decrypted Text:", decrypted_text)

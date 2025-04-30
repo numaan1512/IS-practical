@@ -1,0 +1,56 @@
+RAIL FENCE
+
+
+def rail_fence_encrypt(text, depth):
+    rails = [''] * depth
+    row, step = 0, 1  
+
+    for char in text:
+        rails[row] += char
+        row += step
+
+        if row == depth - 1 or row == 0:  # Change direction at top & bottom
+            step *= -1
+
+    return ''.join(rails)  # Join all rows to get encrypted text
+
+def rail_fence_decrypt(cipher, depth):
+    length = len(cipher)
+    rails = [''] * depth
+    idx, row, step = 0, 0, 1
+
+    for _ in range(length):
+        rails[row] += '*'
+        row += step
+
+        if row == depth - 1 or row == 0:
+            step *= -1
+
+    cipher_index = 0
+    for i in range(depth):
+        rails[i] = list(rails[i])
+        for j in range(len(rails[i])):
+            if rails[i][j] == '*':
+                rails[i][j] = cipher[cipher_index]
+                cipher_index += 1
+
+    row, step, decrypted_text = 0, 1, ""
+    for _ in range(length):
+        decrypted_text += rails[row].pop(0)
+        row += step
+
+        if row == depth - 1 or row == 0:
+            step *= -1
+
+    return decrypted_text
+
+# User Input
+text = input("Enter text: ")
+depth = int(input("Enter depth: "))
+
+# Encryption and Decryption
+encrypted = rail_fence_encrypt(text, depth)
+print(f"Encrypted: {encrypted}")
+
+decrypted = rail_fence_decrypt(encrypted, depth)
+print(f"Decrypted: {decrypted}")

@@ -1,0 +1,73 @@
+RSA
+
+import random
+import math
+
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def generate_prime(start=100, end=500):
+    while True:
+        num = random.randint(start, end)
+        if is_prime(num):
+            return num
+
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+def mod_inverse(e, phi):
+    for d in range(2, phi):
+        if (d * e) % phi == 1:
+            return d
+    return None
+
+def generate_keys():
+    p = generate_prime()
+    q = generate_prime()
+    while q == p:  
+        q = generate_prime()
+
+    n = p * q
+    phi = (p - 1) * (q - 1)
+
+    e = random.randrange(2, phi)
+    while gcd(e, phi) != 1:  
+        e = random.randrange(2, phi)
+
+    d = mod_inverse(e, phi)
+    
+    if d is None:
+        return generate_keys()  
+
+    return ((e, n), (d, n))  
+
+def encrypt(plaintext, public_key):
+    e, n = public_key
+    ciphertext = [pow(ord(char), e, n) for char in plaintext]
+    return ciphertext
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    plaintext = ''.join([chr(pow(char, d, n)) for char in ciphertext])
+    return plaintext
+
+if __name__ == "__main__":
+    print("RSA Algorithm Implementation\n")
+
+    public_key, private_key = generate_keys()
+    print(f"Public Key: {public_key}")
+    print(f"Private Key: {private_key}")
+
+    message = input("\nEnter the message to encrypt: ")
+    encrypted_message = encrypt(message, public_key)
+    print(f"\nEncrypted Message: {encrypted_message}")
+
+    decrypted_message = decrypt(encrypted_message, private_key)
+    print(f"\nDecrypted Message: {decrypted_message}")

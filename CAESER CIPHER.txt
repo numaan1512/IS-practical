@@ -1,0 +1,38 @@
+CAESER CIPHER
+
+
+def caesar_cipher_encrypt(text, shift):
+    lower = "abcdefghijklmnopqrstuvwxyz"
+    upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    encrypted_text = ""
+
+    for char in text:
+        if char in lower:  
+            position = lower.index(char)
+            new_position = (position + shift) % 26  
+            encrypted_text += lower[new_position]
+
+        elif char in upper:  
+            position = upper.index(char)
+            new_position = (position + shift) % 26  
+            encrypted_text += upper[new_position]
+
+        else:
+            encrypted_text += char
+    
+    return encrypted_text
+
+
+def caesar_cipher_decrypt(text, shift):
+    return caesar_cipher_encrypt(text, -shift)  # Just reverse the shift
+
+# Get user input
+plain_text = input("Enter the text: ")
+shift_value = int(input("Enter the shift value (1-25): "))
+
+# Encrypt and decrypt
+encrypted_text = caesar_cipher_encrypt(plain_text, shift_value)
+print(f"Encrypted Text: {encrypted_text}")
+
+decrypted_text = caesar_cipher_decrypt(encrypted_text, shift_value)
+print(f"Decrypted Text: {decrypted_text}")
